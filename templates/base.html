@@ -1,0 +1,95 @@
+{% include 'inc/_nav.html'%}
+{% load static %}
+{% load cache %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Новости со всего мира{% endblock %}</title>
+    {% comment %} <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous"> {% endcomment %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="{% static 'css/style.css' %}"rel="stylesheet">
+  </head>
+  <body style="background-color: #ccc">
+    
+    <div class='title' style="margin-left: 450px;">
+      <h1>{{ title }}</h1>
+    </div>
+
+      <div class = "container mt-3" style="margin-left: 0px;">
+        <div class = "row">
+
+          
+          <div class="d-flex justify-content" style="margin-left: 450px;">
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Поиск</button>
+            </form>
+          </div>
+
+          {% cache 500 sidebar %}
+          <div class='col-md-4'>
+            {% block sidebar %}SIDEBAR{% endblock %}
+          </div>
+          {% endcache %}
+
+          {% if messages %}
+            {% for message in messages %}
+              {% if message.tags == 'error' %}
+                <div class="alert alert-danger" role="alert">
+                  {{ message }}
+                </div>
+              {% else %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                  {{ message }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+            
+
+          <div class='col-md-8'>
+            {% block content %}CONTENT{% endblock %}
+          </div>
+
+          {% if page_obj.has_other_pages %}
+          <nav aria-label="..." style="margin-left: 500px;">
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+              <li class="page-item disabled">
+                <a class="page-link" href="?page={{ page.obj.previous_page_number }}">Пред...</a>
+              </li>
+              {% endif %}
+
+              {% for p in page_obj.paginator.page_range %}
+              {% if page_obj.number == p %}
+              <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ p }}">{{ p }} <span class="sr-only"> (текущая) </span></a>
+              </li>
+
+              {% elif p > page_obj.number|add:-3 and p < page_obj.number|add:3 %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+              </li>
+              {% endif %}
+              {% endfor %}
+              
+              {% if page_obj.has_next %}
+              <li class="page-item disabled">
+                <a class="page-link" href="?page={{ page.obj.next_page_number }}">След ...</a>
+              </li>
+              {% endif %}
+
+            </ul>
+          
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    {% comment %} <scrypt src="{% static 'bootstrap/css/bootstrap.min.js' %}"></scrypt> {% endcomment %}
+  </body>
+</html>
